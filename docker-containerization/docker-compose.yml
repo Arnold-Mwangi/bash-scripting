@@ -1,0 +1,101 @@
+# Full stack: Nginx load-balances across two Flask backends; MySQL uses a named volume.
+# Usage: docker compose up -d
+# App URL: http://localhost  (via Nginx on port 80)
+# Portainer UI: http://localhost:9000  (first visit: create admin user; then watch containers/logs/stats)
+
+services:
+  backend-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "5000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_USER: ${MYSQL_USER:-appuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-appsecret}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-demoapp}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  backend-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "5000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_USER: ${MYSQL_USER:-appuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-appsecret}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-demoapp}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend-1
+      - backend-2
+    restart: unless-stopped
+    networks:
+      - app-net
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootsecret}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-demoapp}
+      MYSQL_USER: ${MYSQL_USER:-appuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-appsecret}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    expose:
+      - "3306"
+    restart: unless-stopped
+    healthcheck:
+      # Must match MYSQL_ROOT_PASSWORD if you change it in .env
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootsecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - app-net
+
+  # Web UI to inspect containers, logs, CPU/RAM while load-testing (Postman, etc.)
+  portainer:
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+networks:
+  app-net:
+    driver: bridge
+    name: app-net
+
+volumes:
+  mysql_data:
+    name: docker-containerization_mysql_data
+  portainer_data:
+    name: docker-containerization_portainer_data
