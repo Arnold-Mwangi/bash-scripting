@@ -138,13 +138,33 @@ docker volume rm mysql-assignment-data
 
 ```bash
 docker network create internal-net
+```
 
+![Create internal-net bridge network](images/create-internal-net.png)
+
+```bash
 docker run -d --name net-a --network internal-net alpine:latest sleep 300
-docker run -d --name net-b --network internal-net nginx:alpine
+```
 
+![Launch container net-a on internal-net](images/net-a.png)
+
+```bash
+docker run -d --name net-b --network internal-net nginx:alpine
+```
+
+![Launch container net-b on internal-net](images/net-b.png)
+
+```bash
 docker exec -it net-a ping -c 3 net-b
+```
+
+![Ping net-b from net-a by container name](images/ping.png)
+
+```bash
 docker exec -it net-a wget -qO- http://net-b
 ```
+
+![Curl net-b HTTP server from net-a using container name](images/server_http.png)
 
 Cleanup:
 
