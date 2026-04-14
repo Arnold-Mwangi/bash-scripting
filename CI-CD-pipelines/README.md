@@ -135,7 +135,7 @@ Retention is defined in `rekon/.gitlab-ci.yml` (`expire_in: 1 week` for key jobs
 ### 4) Container Registry image listing
 ![Container images from registry](images/container%20images%20from%20registry.png)
 
-## Evidence Storage
+## Resource Storage
 
 - `images/` contains screenshots
 - `artifacts/` contains exported logs/build outputs
