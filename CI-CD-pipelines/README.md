@@ -2,9 +2,9 @@
 
 This README documents my class checkpoint implementation for GitLab CI/CD using my existing Spring Boot project, `rekon`.
 
-## Actual Project Used
+## Actual Project Used (imported from gitubs)
 
-- Project path: `/home/kirigwi/Development/clarity/rekon`
+- Project path: `https://gitlab.com/arnoldkirigwi/rekon/`
 - Actual pipeline file: `rekon/.gitlab-ci.yml`
 - Actual Dockerfile: `rekon/Dockerfile`
 - Actual tech stack: Java 17, Spring Boot, Gradle, PostgreSQL, Redis, Docker
