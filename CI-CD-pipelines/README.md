@@ -16,6 +16,7 @@ This submission demonstrates:
 ## Task 1 - Create Project
 
 I Imported a github project for CI/CD work (public visibility) and initialized it with a README.
+** project link ** -- https://gitlab.com/arnoldkirigwi/rekon/
 
 - Group/project created in GitLab
 - Repository initialized
